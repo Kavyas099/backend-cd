@@ -6,7 +6,6 @@ pipeline {
         component = 'backend' 
         region = "us-east-1"
         appVersion = ''
-        targetEnv = ''
     }
 
     options {
@@ -34,17 +33,14 @@ pipeline {
             steps {
                 script{
                     withAWS(region: env.region, credentials: "aws-creds-${env.targetEnv}") {
-
                         sh """
                         aws eks update-kubeconfig --region ${env.region} --name expense-${env.targetEnv}
-
                         kubectl get nodes
                         """
                     }
                 }
             }
         }
-
     }
 
     post { 
