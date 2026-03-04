@@ -3,9 +3,9 @@ pipeline {
 
     environment { 
         project = 'expense'
-        component = 'backend' 
+        component = 'backend'
         region = "us-east-1"
-        appVersion = ''
+        appVersion = "1.0.0"
     }
 
     options {
@@ -15,7 +15,7 @@ pipeline {
 
     parameters{
         string(name: 'version', description: 'Enter the application version')
-        choice(name: 'deploy_to', choices: ['dev', 'qa', 'prod'], description: 'Pick environment')
+        choice(name: 'deploy_to', choices: ['dev','qa','prod'], description: 'Pick environment')
     }
 
     stages {
@@ -23,16 +23,16 @@ pipeline {
         stage('Setup Environment'){
             steps{
                 script{
-                    env.appVersion = params.version
+                    
                     env.targetEnv = params.deploy_to
                 }
             }
         }
 
-        stage('Deploy') {
-            steps {
+        stage('Deploy'){
+            steps{
                 script{
-                    withAWS(region: env.region, credentials: "aws-creds") {
+                    withAWS(region: env.region, credentials: "aws-creds"){
                         sh """
                         aws eks update-kubeconfig --region ${env.region} --name expense-${env.targetEnv}
                         kubectl get nodes
@@ -49,18 +49,17 @@ pipeline {
                 }
             }
         }
-
     }
 
-    post { 
-        always { 
+    post{
+        always{
             echo 'I will always say Hello again!'
             deleteDir()
         }
-        failure { 
+        failure{
             echo 'Pipeline failed'
         }
-        success { 
+        success{
             echo 'Pipeline succeeded'
         }
     }
