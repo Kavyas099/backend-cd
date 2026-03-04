@@ -30,24 +30,25 @@ pipeline {
         }
 
         stage('Deploy') {
-    steps {
-        script{
-            withAWS(region: env.region, credentials: "aws-creds") {
-                sh """
-                aws eks update-kubeconfig --region ${env.region} --name expense-${env.targetEnv}
-                kubectl get nodes
+            steps {
+                script{
+                    withAWS(region: env.region, credentials: "aws-creds") {
+                        sh """
+                        aws eks update-kubeconfig --region ${env.region} --name expense-${env.targetEnv}
+                        kubectl get nodes
 
-               
-                sed -i 's/IMAGE_VERSION/${env.appVersion}/g' values-${env.targetEnv}.yaml
-                
-                cd backend-deploy/helm
-                            sed -i 's/IMAGE_VERSION/${params.version}/g' values-${env.targetENV}.yaml
-                            helm upgrade --install $COMPONENT -n $PROJECT -f values-${env.targetENV}.yaml .
-                """
+                        cd backend-deploy/helm
+
+                        sed -i 's/IMAGE_VERSION/${env.appVersion}/g' values-${env.targetEnv}.yaml
+                        cat values-${env.targetEnv}.yaml
+
+                        helm upgrade --install ${env.component} -n ${env.project} -f values-${env.targetEnv}.yaml .
+                        """
+                    }
+                }
             }
         }
-    }
-}
+
     }
 
     post { 
