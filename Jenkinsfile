@@ -1,10 +1,10 @@
 pipeline {
     agent { label 'kavya' }
     environment { 
-        PROJECT = 'expense'
-        COMPONENT = 'backend' 
-        DEPLOY_TO = "production"
-        REGION = "us-east-1"
+        project = 'expense'
+        component = 'backend' 
+        deploy_to = "production"
+        region = "us-east-1"
         appVersion = ''
         environment = ''
     }
