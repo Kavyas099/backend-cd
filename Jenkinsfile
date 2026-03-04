@@ -40,7 +40,7 @@ pipeline {
                 cd helm
                 sed -i 's/IMAGE_VERSION/${env.appVersion}/g' values-${env.targetEnv}.yaml
                 cat values-${env.targetEnv}.yaml
-                cd helm
+                cd backend-deploy/helm
                             sed -i 's/IMAGE_VERSION/${params.version}/g' values-${env.targetENV}.yaml
                             helm upgrade --install $COMPONENT -n $PROJECT -f values-${env.targetENV}.yaml .
                 """
