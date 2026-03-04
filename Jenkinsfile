@@ -36,8 +36,10 @@ pipeline {
                         sh """
                         aws eks update-kubeconfig --region ${env.region} --name expense-${env.targetEnv}
                         kubectl get nodes
+                            pwd 
+                            ls -la
 
-                        cd backend-deploy/helm
+                        cd helm
 
                         sed -i 's/IMAGE_VERSION/${env.appVersion}/g' values-${env.targetEnv}.yaml
                         cat values-${env.targetEnv}.yaml
