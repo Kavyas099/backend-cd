@@ -5,7 +5,8 @@ pipeline {
         project = 'expense'
         component = 'backend'
         region = "us-east-1"
-        appVersion = "1.0.0"
+         appVersion = ''
+        environment = ''
     }
 
     options {
@@ -13,9 +14,9 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')
     }
 
-    parameters{
-        string(name: 'version', description: 'Enter the application version')
-        choice(name: 'deploy_to', choices: ['dev','qa','prod'], description: 'Pick environment')
+  parameters{
+        string(name: 'version',  description: 'Enter the application version')
+        choice(name: 'deploy_to', choices: ['dev', 'qa', 'prod'], description: 'Pick something')
     }
 
     stages {
@@ -23,33 +24,29 @@ pipeline {
         stage('Setup Environment'){
             steps{
                 script{
-                    
-                    env.targetEnv = params.deploy_to
+                    appVersion = params.version
+                    environment = params.deploy_to
                 }
             }
         }
 
-        stage('Deploy'){
-            steps{
+       
+
+      stage('Deploy') {
+            steps {
                 script{
-                    withAWS(region: env.region, credentials: "aws-creds"){
+                    withAWS(region: 'us-east-1', credentials: "aws-creds-${environment}") {
                         sh """
-                        aws eks update-kubeconfig --region ${env.region} --name expense-${env.targetEnv}
-                        kubectl get nodes
-
-                        cd helm
-
-                        helm upgrade --install ${env.component} \
-                        -n ${env.project} \
-                        -f values-${env.targetEnv}.yaml \
-                        --set deployment.version=${env.appVersion} \
-                        .
+                            aws eks update-kubeconfig --region $REGION --name expense-${environment}
+                            kubectl get nodes
+                            cd helm
+                            sed -i 's/IMAGE_VERSION/${params.version}/g' values-${environment}.yaml
+                            helm upgrade --install $COMPONENT -n $PROJECT -f values-${environment}.yaml .
                         """
                     }
                 }
             }
         }
-    }
 
     post{
         always{
